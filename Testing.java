@@ -2,6 +2,8 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 
+import javax.crypto.Cipher;
+
 public class Testing {
     private Repository repo1;
     private Repository repo2;
@@ -16,6 +18,21 @@ public class Testing {
     }
 
     // TODO: Write your tests here!
+    @Test
+    @DisplayName("Middle Test")
+    public void middleTest() throws InterruptedException {
+        repo1.commit("commit 1");
+        repo1.commit("commit 2");
+        repo2.commit("commit 1");
+        repo1.commit("commit 3");
+        repo2.commit("commit 2");
+        repo1.commit("commit 4");
+        repo1.commit("commit 5");
+        repo1.synchronize(repo2);
+        assertEquals(7, repo1.getRepoSize());
+
+    }
+
 
     /////////////////////////////////////////////////////////////////////////////////
     // PROVIDED HELPER METHODS (You don't have to use these if you don't want to!) //

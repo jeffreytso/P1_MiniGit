@@ -3,9 +3,148 @@ import java.text.SimpleDateFormat;
 
 public class Repository {
 
-    /**
-     * TODO: Implement your code here.
-     */
+    private String name;
+    private Commit head;
+    private int size;
+
+    public Repository(String name) {
+        if (name == "" || name == null) {
+            throw new IllegalArgumentException("Name cannot be empty or null.");
+        }
+
+        this.name = name;
+        this.size = 0;
+        this.head = null;
+    }
+
+    public String getRepoHead() {
+        if (head == null) {
+            return null;
+        } else {
+            return head.id;
+        }
+    }
+
+    public int getRepoSize() {
+        return size;
+    }
+
+    public String toString() {
+        String result = name + " - ";
+        if (getRepoSize() == 0) {
+            return result + "No commits";
+        } else {
+            return result + "Current head: " + head.toString();
+        }   
+    }
+
+    public boolean contains(String targetId) {
+        Commit currentCommit = head;
+        while (currentCommit != null) {
+            if (currentCommit.id.equals(targetId)) {
+                return true;
+            }
+            currentCommit = currentCommit.past;
+        }
+        return false;
+
+    }
+
+    public String getHistory(int n) {
+        if (n <= 0) {
+            throw new IllegalArgumentException("Number entered should be positive.");
+        }
+        if (size == 0) {
+            return "";
+        }
+        String history = "";
+        int numCommits = n;
+        Commit currentCommit = head;
+        while (numCommits != 0 && currentCommit != null) {
+            history += currentCommit.toString() + "\n";
+            currentCommit = currentCommit.past;
+            numCommits--;
+        }
+        return history;
+    }
+
+    public String commit(String message) {
+        Commit newHead = new Commit(message, head);
+        head = newHead;
+        size++;
+        return head.id;
+    }
+
+    public boolean drop(String targetId) {
+        if (head == null) {
+            return false;
+        }
+        if (targetId.equals("0") && size == 1) {
+            head = null;
+            size--;
+            return true;
+        }
+        Commit currentCommit = head;
+        Commit tempCommit = currentCommit;
+        while (currentCommit.past != null) {
+            if (currentCommit.past.id.equals(targetId)) {
+                currentCommit.past = currentCommit.past.past;
+                head = tempCommit;
+                size--;
+                return true;
+            }
+            currentCommit = currentCommit.past;
+        }
+        return false;
+    }
+
+    public void synchronize(Repository other) {
+        Commit thisCommit = this.head;
+        Commit otherCommit = other.head;
+        Commit finalCommit;
+        if (thisCommit.timeStamp > otherCommit.timeStamp) {
+            finalCommit = thisCommit;
+        } else {
+            finalCommit = otherCommit;
+        }
+        int finalSize = this.size + other.size;
+
+        while (thisCommit.past != null && otherCommit.past != null) {
+            if (thisCommit.timeStamp > otherCommit.timeStamp) {
+                if (thisCommit.past.timeStamp > otherCommit.timeStamp) {
+                    thisCommit.past = thisCommit;
+                } else {
+                    Commit tempThisCommit = thisCommit;
+                    thisCommit.past = otherCommit;
+                    thisCommit.past.past = tempThisCommit.past;
+
+                    otherCommit = otherCommit.past;
+                    thisCommit = thisCommit.past;
+                }
+            } else {
+                if (otherCommit.past.timeStamp > thisCommit.timeStamp) {
+                    otherCommit.past = otherCommit;
+                } else {
+                    Commit tempOtherCommit = otherCommit;
+                    otherCommit.past = thisCommit;
+                    otherCommit.past.past = tempOtherCommit.past;
+
+                    thisCommit = thisCommit.past;
+                    otherCommit = otherCommit.past;
+                }
+            }
+        }
+        if (thisCommit.past == null) {
+            thisCommit.past = otherCommit;
+        } else {
+            otherCommit.past = thisCommit;
+        }
+        this.head = finalCommit;
+        this.size = finalSize;
+        other.head = null;
+        other.size = 0;
+    }
+
 
     /**
      * DO NOT MODIFY

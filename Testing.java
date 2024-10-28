@@ -55,7 +55,7 @@ public class Testing {
         assertEquals(null, repo2.getRepoHead());
         assertEquals(4, repo1.getRepoSize());
 
-        // Repo2
+        
     }
 
 

@@ -1,12 +1,26 @@
 import java.util.*;
 import java.text.SimpleDateFormat;
 
+// Jeffrey Tso
+// 10/30/2024
+// CSE 123
+// Programming Assignment 1: MiniGit
+// Sean Eglip
+
+// Simulates a real repository by supporting a subset of the operations supported by real 
+// Git repositories. This includes tracking metadata and history.
 public class Repository {
 
     private String name;
     private Commit head;
     private int size;
 
+    // Behavior:
+    //      - Creates a new, empty repository with the specified name.
+    // Exceptions:
+    //      - Throws an IllegalArgumentException if the name is null or empty.
+    // Parameters:
+    //      - Takes a name (String).
     public Repository(String name) {
         if (name == "" || name == null) {
             throw new IllegalArgumentException("Name cannot be empty or null.");
@@ -17,6 +31,11 @@ public class Repository {
         this.head = null;
     }
 
+    // Behavior:
+    //      - Return the ID of the current head of this repository.
+    // Returns:
+    //      - Returns the head ID (String) of this repository. 
+    //      - Returns null if the current head is null.
     public String getRepoHead() {
         if (head == null) {
             return null;
@@ -25,10 +44,13 @@ public class Repository {
         }
     }
 
+    // Returns the number of commits (int) in the repository.
     public int getRepoSize() {
         return size;
     }
 
+    // Returns a string representation of the repository. The string includes the name of the
+    // repository and the current head (if it exists).
     public String toString() {
         String result = name + " - ";
         if (getRepoSize() == 0) {
@@ -38,6 +60,12 @@ public class Repository {
         }   
     }
 
+    // Behavior:
+    //      - Determines whether the commit with the passed Id is in the repository.
+    // Returns:
+    //      - Returns true if the specified commit is in the repository, false if not.
+    // Parameter:
+    //      - Takes an Id (String).
     public boolean contains(String targetId) {
         Commit currentCommit = head;
         while (currentCommit != null) {
@@ -50,6 +78,18 @@ public class Repository {
 
     }
 
+    // Behavior:
+    //      - Returns a string consisting of the String representations of a specified amount of
+    //      - most recent commits in the repository, with the most recent first. If there are 
+    //      - fewer than the specified amount of commits in the repository, return them all.
+    // Exceptions:
+    //      - Throws an IllegalArgumentException if n is non-positive.
+    // Returns:
+    //      - Returns the completed string representation. If there are no commits in the
+    //      - repository, returns an empty string.
+    // Parameter:
+    //      - Takes in a number (int) that specifies how many 
+    //      - past commits should be included in the return string.
     public String getHistory(int n) {
         if (n <= 0) {
             throw new IllegalArgumentException("Number entered should be positive.");
@@ -68,6 +108,12 @@ public class Repository {
         return history;
     }
 
+    // Behavior:
+    //      - Creates a new commit with the given message and adds it to the repository.
+    // Return:
+    //      - Returns the ID of the new commit.
+    // Parameter:
+    //      - Takes in a message (String) to be included in the new commit.
     public String commit(String message) {
         Commit newHead = new Commit(message, head);
         head = newHead;
@@ -75,12 +121,19 @@ public class Repository {
         return head.id;
     }
 
+    // Behavior:
+    //      - Removes the commit with the specified ID from the repository.
+    // Return:
+    //      - Returns true if the commit was successfully dropped, and false if there is no
+    //      - commit that matches the given ID in the repository.
+    // Parameter:
+    //      - Takes in an ID (String). (ASK WHETHER NON NULLITY IS REQUIRED)
     public boolean drop(String targetId) {
         if (head == null) {
             return false;
         }
-        if (targetId.equals("0") && size == 1) {
-            head = null;
+        if (head.id.equals(targetId)) {
+            head = head.past;
             size--;
             return true;
         }
@@ -98,51 +151,70 @@ public class Repository {
         return false;
     }
 
+    // Behavior:
+    //      - Takes all the commits from a separate repository and moves them into this repository,
+    //      - combining the two repository histories such that chronological order is preserved. 
+    //      - The commits are ordered in timestamp order from most recent to least recent. If this
+    //      - repository is empty, all commits in the other repository gets moved into this one.
+    // Parameters:
+    //      - Takes in another repository (Repository). The other repository will become null
+    //      - following the execution of this method. If the other repository is passed
+    //      - initially as null, this repository remains unchanged.
     public void synchronize(Repository other) {
-        Commit thisCommit = this.head;
-        Commit otherCommit = other.head;
-        Commit finalCommit;
-        if (thisCommit.timeStamp > otherCommit.timeStamp) {
-            finalCommit = thisCommit;
-        } else {
-            finalCommit = otherCommit;
-        }
-        int finalSize = this.size + other.size;
-
-        while (thisCommit.past != null && otherCommit.past != null) {
-            if (thisCommit.timeStamp > otherCommit.timeStamp) {
-                if (thisCommit.past.timeStamp > otherCommit.timeStamp) {
-                    thisCommit.past = thisCommit;
-                } else {
-                    Commit tempThisCommit = thisCommit;
-                    thisCommit.past = otherCommit;
-                    thisCommit.past.past = tempThisCommit.past;
-
-                    otherCommit = otherCommit.past;
-                    thisCommit = thisCommit.past;
-                }
+        if (this.head == null && other.head != null){
+            this.head = other.head;
+            other.head = null;
+            this.size = other.size;
+            other.size = 0;
+        } else if (this.head != null && other.head != null) {
+            Commit finalCommit;
+            if (this.head.timeStamp > other.head.timeStamp) {
+                finalCommit = this.head;
             } else {
-                if (otherCommit.past.timeStamp > thisCommit.timeStamp) {
-                    otherCommit.past = otherCommit;
-                } else {
-                    Commit tempOtherCommit = otherCommit;
-                    otherCommit.past = thisCommit;
-                    otherCommit.past.past = tempOtherCommit.past;
+                finalCommit = other.head;
+            }
+            int finalSize = this.size + other.size;
 
-                    thisCommit = thisCommit.past;
-                    otherCommit = otherCommit.past;
+            
+            while (this.head != null && other.head != null) {
+                if (this.head.timeStamp > other.head.timeStamp) {
+                    if (this.head.past == null) {
+                        this.head.past = other.head;
+                        other.head = null;
+                    } else if (this.head.past.timeStamp > other.head.timeStamp) {
+                        this.head = this.head.past;
+                    } else {
+                        Commit temp1 = this.head.past;
+                        Commit temp2 = other.head.past;
+                        this.head.past = other.head;
+                        this.head.past.past = temp1;
+
+                        this.head = this.head.past;
+                        other.head = temp2;
+                    }
+                } else {
+                    if (other.head.past == null) {
+                        other.head.past = this.head;
+                        this.head = null;
+                    } else if (other.head.past.timeStamp > this.head.timeStamp) {
+                        other.head = other.head.past;
+                    } else {
+                        Commit temp1 = other.head.past;
+                        Commit temp2 = this.head.past;
+                        other.head.past = this.head;
+                        other.head.past.past = temp1;
+
+                        other.head = other.head.past;
+                        this.head = temp2;
+                    }
                 }
             }
+            this.head = finalCommit;
+            this.size = finalSize;
+            other.head = null;
+            other.size = 0;
         }
-        if (thisCommit.past == null) {
-            thisCommit.past = otherCommit;
-        } else {
-            otherCommit.past = thisCommit;
-        }
-        this.head = finalCommit;
-        this.size = finalSize;
-        other.head = null;
-        other.size = 0;
+            
     }
 
 

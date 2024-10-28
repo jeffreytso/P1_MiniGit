@@ -19,18 +19,39 @@ public class Testing {
 
     // TODO: Write your tests here!
     @Test
+    @DisplayName("Front Test")
+    public void frontTest() throws InterruptedException {
+        // Both empty
+        repo1.synchronize(repo2);
+        assertEquals(null, repo1.getRepoHead());
+        assertEquals(0, repo1.getRepoSize());
+
+        // Repo2 non-null, repo1 empty
+        repo2.commit("Repo2 Commit 1");
+        repo1.synchronize(repo2);
+        assertEquals(true, repo1.contains("0"));
+        assertEquals(1, repo1.getRepoSize());
+        assertEquals(0, repo2.getRepoSize());
+
+        // Repo1 non-null, repo2 empty
+        repo1.synchronize(repo2);
+        assertEquals(true, repo1.contains("0"));
+        assertEquals(1, repo1.getRepoSize());
+    }
+
+    @Test
     @DisplayName("Middle Test")
     public void middleTest() throws InterruptedException {
-        repo1.commit("commit 1");
-        repo1.commit("commit 2");
-        repo2.commit("commit 1");
-        repo1.commit("commit 3");
-        repo2.commit("commit 2");
-        repo1.commit("commit 4");
-        repo1.commit("commit 5");
+        // Final commit head.past is null
+        repo2.commit("Repo2 Commit 1");
+        repo2.commit("Repo2 Commit 2");
+        repo2.commit("Repo2 Commit 3");
+        repo1.commit("Repo1 Commit 1");
         repo1.synchronize(repo2);
-        assertEquals(7, repo1.getRepoSize());
+        assertEquals(null, repo2.getRepoHead());
+        assertEquals(4, repo1.getRepoSize());
 
+        // Repo2
     }
 
 

@@ -4,6 +4,12 @@ import java.util.*;
 
 import javax.crypto.Cipher;
 
+// Jeffrey Tso
+// 10/30/2024
+// CSE 123
+// Programming Assignment 1: MiniGit
+// Sean Eglip
+
 public class Testing {
     private Repository repo1;
     private Repository repo2;

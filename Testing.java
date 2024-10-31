@@ -28,34 +28,41 @@ public class Testing {
         // Both empty
         repo1.synchronize(repo2);
         assertEquals(null, repo1.getRepoHead());
-        assertEquals(0, repo1.getRepoSize());
+        assertEquals(null, repo2.getRepoHead());
 
         // Repo2 non-null, repo1 empty
-        repo2.commit("Repo2 Commit 1");
+        repo2.commit("R2C1");
         repo1.synchronize(repo2);
-        assertEquals(true, repo1.contains("0"));
-        assertEquals(1, repo1.getRepoSize());
-        assertEquals(0, repo2.getRepoSize());
+        testHistory(repo1, 1, new String[] {"R2C1"});
 
         // Repo1 non-null, repo2 empty
         repo1.synchronize(repo2);
-        assertEquals(true, repo1.contains("0"));
-        assertEquals(1, repo1.getRepoSize());
+        testHistory(repo1, 1, new String[] {"R2C1"});
     }
 
     @Test
     @DisplayName("Middle Test")
     public void middleTest() throws InterruptedException {
-        // Final commit head.past is null
-        repo2.commit("Repo2 Commit 1");
-        repo2.commit("Repo2 Commit 2");
-        repo2.commit("Repo2 Commit 3");
-        repo1.commit("Repo1 Commit 1");
+        // General case
+        commitAll(repo1, new String[] {"R1C1"});
+        commitAll(repo2, new String[] {"R2C1"});
+        commitAll(repo1, new String[] {"R1C2"});
+        commitAll(repo2, new String[] {"R2C2"});
+        commitAll(repo1, new String[] {"R1C3"});
         repo1.synchronize(repo2);
-        assertEquals(null, repo2.getRepoHead());
-        assertEquals(4, repo1.getRepoSize());
+        testHistory(repo1, 5, new String[] {"R1C1", "R2C1", "R1C2", "R2C2", "R1C3"});
+    }
+    
 
-        
+    @Test
+    @DisplayName("End Test")
+    public void endTest() throws InterruptedException {
+        // Testing repo2.past == null while repo1 still has elements
+        commitAll(repo1, new String[] {"one", "two", "three"});
+        commitAll(repo2, new String[] {"four", "five", "six"});
+        commitAll(repo1, new String[] {"seven"});
+        repo1.synchronize(repo2);
+        testHistory(repo1, 7, new String[] {"one", "two", "three", "four", "five", "six", "seven"});
     }
 
 

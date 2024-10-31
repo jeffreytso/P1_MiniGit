@@ -65,7 +65,7 @@ public class Repository {
     // Returns:
     //      - Returns true if the specified commit is in the repository, false if not.
     // Parameter:
-    //      - Takes an Id (String).
+    //      - Takes an Id (String). The Id should be non-null.
     public boolean contains(String targetId) {
         Commit currentCommit = head;
         while (currentCommit != null) {
@@ -81,7 +81,7 @@ public class Repository {
     // Behavior:
     //      - Returns a string consisting of the String representations of a specified amount of
     //      - most recent commits in the repository, with the most recent first. If there are 
-    //      - fewer than the specified amount of commits in the repository, return them all.
+    //      - fewer than the specified amount of commits in the repository, returns them all.
     // Exceptions:
     //      - Throws an IllegalArgumentException if n is non-positive.
     // Returns:
@@ -114,6 +114,7 @@ public class Repository {
     //      - Returns the ID of the new commit.
     // Parameter:
     //      - Takes in a message (String) to be included in the new commit.
+    //      - The message should be non-null.
     public String commit(String message) {
         Commit newHead = new Commit(message, head);
         head = newHead;
@@ -127,7 +128,7 @@ public class Repository {
     //      - Returns true if the commit was successfully dropped, and false if there is no
     //      - commit that matches the given ID in the repository.
     // Parameter:
-    //      - Takes in an ID (String). (ASK WHETHER NON NULLITY IS REQUIRED)
+    //      - Takes in an ID (String). The Id should be non-null.
     public boolean drop(String targetId) {
         if (head == null) {
             return false;
@@ -155,11 +156,11 @@ public class Repository {
     //      - Takes all the commits from a separate repository and moves them into this repository,
     //      - combining the two repository histories such that chronological order is preserved. 
     //      - The commits are ordered in timestamp order from most recent to least recent. If this
-    //      - repository is empty, all commits in the other repository gets moved into this one.
+    //      - repository is empty, all commits in the other repository gets moved into this one. 
+    //      - The other repository will become null following the execution of this method. If the
+    //      - other repository is passed initially as null, this repository remains unchanged.
     // Parameters:
-    //      - Takes in another repository (Repository). The other repository will become null
-    //      - following the execution of this method. If the other repository is passed
-    //      - initially as null, this repository remains unchanged.
+    //      - Takes in another repository (Repository) that should be non-null.
     public void synchronize(Repository other) {
         if (this.head == null && other.head != null){
             this.head = other.head;

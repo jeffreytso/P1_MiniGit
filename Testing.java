@@ -21,10 +21,9 @@ public class Testing {
         Repository.Commit.resetIds();
     }
 
-    // TODO: Write your tests here!
     @Test
-    @DisplayName("Front Test")
-    public void frontTest() throws InterruptedException {
+    @DisplayName("Synchronize Front Test")
+    public void syncFrontTest() throws InterruptedException {
         // Both empty
         repo1.synchronize(repo2);
         assertEquals(null, repo1.getRepoHead());
@@ -32,6 +31,7 @@ public class Testing {
 
         // Repo2 non-null, repo1 empty
         repo2.commit("one");
+        assertEquals(1, repo2.getRepoSize());
         repo1.synchronize(repo2);
         testHistory(repo1, 1, new String[] {"one"});
 
@@ -41,27 +41,35 @@ public class Testing {
     }
 
     @Test
-    @DisplayName("Middle Test")
-    public void middleTest() throws InterruptedException {
+    @DisplayName("Synchronize Middle Test")
+    public void syncMiddleTest() throws InterruptedException {
         // General case
         commitAll(repo1, new String[] {"one"});
         commitAll(repo2, new String[] {"two"});
         commitAll(repo1, new String[] {"three"});
         commitAll(repo2, new String[] {"four"});
         commitAll(repo1, new String[] {"five"});
+        assertEquals(3, repo1.getRepoSize());
+        assertEquals(2, repo2.getRepoSize());
         repo1.synchronize(repo2);
+        assertEquals(5, repo1.getRepoSize());
+        assertEquals(0, repo2.getRepoSize());
         testHistory(repo1, 5, new String[] {"one", "two", "three", "four", "five"});
     }
     
 
     @Test
-    @DisplayName("End Test")
-    public void endTest() throws InterruptedException {
-        // Testing repo2.past == null while repo1 still has elements
+    @DisplayName("Synchronize End Test")
+    public void syncEndTest() throws InterruptedException {
+        // Testing when repo2.past == null while repo1 still has elements
         commitAll(repo1, new String[] {"one", "two", "three"});
         commitAll(repo2, new String[] {"four", "five", "six"});
         commitAll(repo1, new String[] {"seven"});
+        assertEquals(4, repo1.getRepoSize());
+        assertEquals(3, repo2.getRepoSize());
         repo1.synchronize(repo2);
+        assertEquals(7, repo1.getRepoSize());
+        assertEquals(0, repo2.getRepoSize());
         testHistory(repo1, 7, new String[] {"one", "two", "three", "four", "five", "six", "seven"});
     }
 

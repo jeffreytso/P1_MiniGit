@@ -31,26 +31,26 @@ public class Testing {
         assertEquals(null, repo2.getRepoHead());
 
         // Repo2 non-null, repo1 empty
-        repo2.commit("R2C1");
+        repo2.commit("one");
         repo1.synchronize(repo2);
-        testHistory(repo1, 1, new String[] {"R2C1"});
+        testHistory(repo1, 1, new String[] {"one"});
 
         // Repo1 non-null, repo2 empty
         repo1.synchronize(repo2);
-        testHistory(repo1, 1, new String[] {"R2C1"});
+        testHistory(repo1, 1, new String[] {"one"});
     }
 
     @Test
     @DisplayName("Middle Test")
     public void middleTest() throws InterruptedException {
         // General case
-        commitAll(repo1, new String[] {"R1C1"});
-        commitAll(repo2, new String[] {"R2C1"});
-        commitAll(repo1, new String[] {"R1C2"});
-        commitAll(repo2, new String[] {"R2C2"});
-        commitAll(repo1, new String[] {"R1C3"});
+        commitAll(repo1, new String[] {"one"});
+        commitAll(repo2, new String[] {"two"});
+        commitAll(repo1, new String[] {"three"});
+        commitAll(repo2, new String[] {"four"});
+        commitAll(repo1, new String[] {"five"});
         repo1.synchronize(repo2);
-        testHistory(repo1, 5, new String[] {"R1C1", "R2C1", "R1C2", "R2C2", "R1C3"});
+        testHistory(repo1, 5, new String[] {"one", "two", "three", "four", "five"});
     }
     
 

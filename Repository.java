@@ -153,12 +153,13 @@ public class Repository {
     }
 
     // Behavior:
-    //      - Takes all the commits from a separate repository and moves them into this repository,
-    //      - combining the two repository histories such that chronological order is preserved. 
-    //      - The commits are ordered in timestamp order from most recent to least recent. If this
-    //      - repository is empty, all commits in the other repository gets moved into this one. 
-    //      - The other repository will become null following the execution of this method. If the
-    //      - other repository is passed initially as null, this repository remains unchanged.
+    //      - Takes all the commits from a separate repository and moves them into this
+    //      - repository, combining the two repository histories such that chronological
+    //      - order is preserved. The commits are ordered in timestamp order from most
+    //      - recent to least recent. If this repository is empty, all commits in the other
+    //      - repository gets moved into this one. If the other repository is passed initially
+    //      - as null, this repository remains unchanged. The other repository will
+    //      - become null following the execution of this method.
     // Parameters:
     //      - Takes in another repository (Repository) that should be non-null.
     public void synchronize(Repository other) {

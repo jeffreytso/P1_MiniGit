@@ -94,9 +94,6 @@ public class Repository {
         if (n <= 0) {
             throw new IllegalArgumentException("Number entered should be positive.");
         }
-        if (size == 0) {
-            return "";
-        }
         String history = "";
         int numCommits = n;
         Commit currentCommit = head;
